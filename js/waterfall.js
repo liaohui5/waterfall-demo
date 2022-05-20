@@ -1,10 +1,8 @@
 (function () {
-  // The DOM structure needed to generate the waterfall
+  // generate html
   function mockHTML(id) {
-    // Generate random numbers with minimum and maximum value ranges
-    function getRangeNumber(Min, Max) {
-      var range = Max - Min;
-      return Min + Math.round(range * Math.random());
+    function getRangeNumber(min, max) {
+      return min + Math.round(max - min * Math.random());
     }
 
     var html = "";
@@ -51,7 +49,7 @@
     var firstLineItemsHeight = [];
     var minItemIndex = -1;
 
-    // Get the index of the smallest value in the array
+    // 获取数组中最小值的索引
     function getMinValueIndex(array) {
       var minVal = Math.min.apply(null, array);
       return array.indexOf(minVal);
@@ -63,12 +61,12 @@
       item.style.width = this.itemWidth + "px";
 
       if (i < this.columns) {
-        // first line items
+        // 第一行
         firstLineItemsHeight.push(item.offsetHeight);
         item.style.top = "0px";
         item.style.left = i * (this.itemWidth + this.gap) + "px";
       } else {
-        // other line items
+        // 后面其他行
         minItemIndex = getMinValueIndex(firstLineItemsHeight);
         item.style.top = firstLineItemsHeight[minItemIndex] + this.gap + "px";
         item.style.left = this.items[minItemIndex].offsetLeft + "px";
