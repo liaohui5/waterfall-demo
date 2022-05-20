@@ -2,19 +2,92 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Waterfall</title>
-    <script src="./js/waterfall.js"></script>
+    <title>JavaScript</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #waterfall-container {
+        width: 1200px;
+        margin: 0 auto;
+        position: relative;
+      }
+      #waterfall-container .item {
+        padding: 10px;
+        border: 1px solid #eee;
+        box-sizing: border-box;
+      }
+      .page-header {
+        text-align: center;
+        padding: 0;
+        margin: 0;
+        line-height: 200px;
+        font-size: 24px;
+      }
+    </style>
   </head>
   <body>
+    <h2 class="page-header">瀑布流</h2>
+    <div id="waterfall-container"></div>
+    <script src="./waterfall.js"></script>
     <script>
+      // 模拟: 请求数据后创建dom
+      function mockDoms(total) {
+        // 范围随机数
+        function getRangeNumber(min, max) {
+          return min + Math.round((max - min) * Math.random());
+        }
+
+        // 随机16进制颜色
+        function getRandomColor() {
+          return "#" + Math.floor(Math.random() * 0xffffff).toString(16);
+        }
+
+        var item,
+          fragment = document.createDocumentFragment();
+        for (var i = 0; i < total; i++) {
+          item = document.createElement("div");
+          item.className = "item";
+          item.style.height = getRangeNumber(200, 500) + "px";
+          item.style.background = getRandomColor();
+          item.textContent = "item" + i;
+          fragment.append(item);
+        }
+        return fragment;
+      }
+
+      // 模拟: 请求更多数据 然后创建dom
+      function mockAjax() {
+        var container = document.getElementById("waterfall-container");
+        container.append(mockDoms(30));
+      }
+
       window.onload = function () {
-        window.mockHTML("app");
-        new Waterfall({
-          el: "#app",
-          columns: 6,
+        var wf = new Waterfall({
           gap: 10,
+          columns: 5,
+          itemSelector: "item",
+          container: document.getElementById("waterfall-container"),
+          autoRender: false, // 是否立即渲染
+        });
+
+        // 页面第一次加载&渲染数据
+        mockAjax();
+        wf.render();
+
+        // 滚动到最底部, 加载更多
+        window.addEventListener("scroll", function () {
+          // scrollTop: 网页总高度, scollHeight: 已经滚动的高度, clientHeight: 可视区高度
+          var { scrollHeight, scrollTop, clientHeight } =
+            document.documentElement;
+
+          // 滚动到底部加载更多 & 重新用瀑布流排列
+          if (scrollTop + clientHeight >= scrollHeight - 30) {
+            mockAjax();
+            wf.render();
+          }
         });
       };
     </script>
